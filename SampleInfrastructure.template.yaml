@@ -86,6 +86,15 @@ Resources:
       Handler: CloudFormationCognitoUserPoolDomain.handler
       Role: !GetAtt LambdaForCloudFormation.Arn
     DependsOn: CloudFormationSendResponse
+  CloudFormationCognitoResourceServer:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: CloudFormationCognitoResourceServer
+      Runtime: nodejs8.10
+      Code: ./CloudFormationCognitoResourceServer.js
+      Handler: CloudFormationCognitoResourceServer.handler
+      Role: !GetAtt LambdaForCloudFormation.Arn
+    DependsOn: CloudFormationSendResponse
   UserPoolTest:
     Type: 'AWS::Cognito::UserPool'
     Properties:
@@ -117,3 +126,13 @@ Resources:
       ServiceToken: !GetAtt CloudFormationCognitoUserPoolDomain.Arn
       UserPoolId: !Ref UserPoolTest
       Domain: 'userpool-test-01'
+  CognitoResourceServer:
+    Type: 'Custom::CognitoResourceServer'
+    Properties:
+      ServiceToken: !GetAtt CloudFormationCognitoResourceServer.Arn
+      Identifier: LifeBenefits-Dev
+      Name: LifeBenefits-Dev
+      UserPoolId: !Ref UserPoolTest
+      Scopes:
+        - ScopeDescription: 'Read UW status'
+          ScopeName: 'read-uw-status'
