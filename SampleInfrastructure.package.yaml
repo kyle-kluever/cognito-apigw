@@ -50,6 +50,9 @@ Resources:
             Action: cognito-idp:CreateResourceServer
             Resource: arn:aws:cognito-idp:*:*:userpool/*
           - Effect: Allow
+            Action: cognito-idp:UpdateResourceServer
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+          - Effect: Allow
             Action: cognito-idp:DeleteResourceServer
             Resource: arn:aws:cognito-idp:*:*:userpool/*
           - Effect: Allow
@@ -82,7 +85,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: 185bb6e4da1d16a71d49aa146a5a6974
+        S3Key: b9361dcfaa9561dedc79db26e75e0030
       Handler: CloudFormationCognitoUserPoolClientSettings.handler
       Role:
         Fn::GetAtt:
@@ -96,7 +99,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: 993c996216730e235ebd670b8ba0eb4f
+        S3Key: fcc0edc03f2d9bc636ca231c090c70b2
       Handler: CloudFormationCognitoUserPoolDomain.handler
       Role:
         Fn::GetAtt:
@@ -110,7 +113,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: 4b1801e2811705a6cca80999949230eb
+        S3Key: bf8168336a448732f349246b0b80b450
       Handler: CloudFormationCreateResourceServer.handler
       Role:
         Fn::GetAtt:
@@ -171,3 +174,5 @@ Resources:
       Scopes:
       - ScopeDescription: Read UW status
         ScopeName: read-uw-status
+      - ScopeDescription: Create EOI Notification
+        ScopeName: create-eoi-notification
