@@ -141,7 +141,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt CloudFormationCognitoUserPoolDomain.Arn
       UserPoolId: !Ref UserPoolTest
-      Domain: 'userpool-test-01'
+      Domain: 'kyle-userpool-test-01'
   CognitoResourceServer:
     Type: 'Custom::CognitoResourceServer'
     Properties:

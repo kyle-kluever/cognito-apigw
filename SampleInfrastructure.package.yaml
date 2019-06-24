@@ -82,7 +82,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: a72a35c01be1cda390b63ea5d64a37d1
+        S3Key: 185bb6e4da1d16a71d49aa146a5a6974
       Handler: CloudFormationCognitoUserPoolClientSettings.handler
       Role:
         Fn::GetAtt:
@@ -96,7 +96,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: 0e2f9db7106d05170ed86a0626b15694
+        S3Key: 993c996216730e235ebd670b8ba0eb4f
       Handler: CloudFormationCognitoUserPoolDomain.handler
       Role:
         Fn::GetAtt:
@@ -110,7 +110,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: 7264b6f25485185689d98b7ae806acbb
+        S3Key: 4b1801e2811705a6cca80999949230eb
       Handler: CloudFormationCreateResourceServer.handler
       Role:
         Fn::GetAtt:
@@ -156,7 +156,7 @@ Resources:
         - Arn
       UserPoolId:
         Ref: UserPoolTest
-      Domain: userpool-test-01
+      Domain: kyle-userpool-test-01
   CognitoResourceServer:
     Type: Custom::CognitoResourceServer
     Properties:
