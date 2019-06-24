@@ -1,0 +1,173 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  LambdaForCloudFormation:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaForCloudFormation
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      Policies:
+      - PolicyName: WriteCloudWatchLogs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: UpdateUserPoolClient
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: cognito-idp:UpdateUserPoolClient
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+      - PolicyName: ManageUserPoolDomain
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: cognito-idp:CreateUserPoolDomain
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+          - Effect: Allow
+            Action: cognito-idp:DeleteUserPoolDomain
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+          - Effect: Allow
+            Action: cognito-idp:DescribeUserPoolDomain
+            Resource: '*'
+      - PolicyName: ManageResourceServer
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: cognito-idp:CreateResourceServer
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+          - Effect: Allow
+            Action: cognito-idp:DeleteResourceServer
+            Resource: arn:aws:cognito-idp:*:*:userpool/*
+          - Effect: Allow
+            Action: cognito-idp:DescribeResourceServer
+            Resource: '*'
+      - PolicyName: InvokeLambdaFunction
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: arn:aws:lambda:*:*:function:*
+  CloudFormationSendResponse:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudFormationSendResponse
+      Runtime: nodejs8.10
+      Code:
+        S3Bucket: kyle-cf-templates
+        S3Key: 5c0bacbeb9e8b8aebb8ffc7d01a709de
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+        - LambdaForCloudFormation
+        - Arn
+  CloudFormationCognitoUserPoolClientSettings:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudFormationCognitoUserPoolClientSettings
+      Runtime: nodejs8.10
+      Code:
+        S3Bucket: kyle-cf-templates
+        S3Key: a72a35c01be1cda390b63ea5d64a37d1
+      Handler: CloudFormationCognitoUserPoolClientSettings.handler
+      Role:
+        Fn::GetAtt:
+        - LambdaForCloudFormation
+        - Arn
+    DependsOn: CloudFormationSendResponse
+  CloudFormationCognitoUserPoolDomain:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudFormationCognitoUserPoolDomain
+      Runtime: nodejs8.10
+      Code:
+        S3Bucket: kyle-cf-templates
+        S3Key: 0e2f9db7106d05170ed86a0626b15694
+      Handler: CloudFormationCognitoUserPoolDomain.handler
+      Role:
+        Fn::GetAtt:
+        - LambdaForCloudFormation
+        - Arn
+    DependsOn: CloudFormationSendResponse
+  CloudFormationCognitoResourceServer:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CloudFormationCognitoResourceServer
+      Runtime: nodejs8.10
+      Code:
+        S3Bucket: kyle-cf-templates
+        S3Key: 7264b6f25485185689d98b7ae806acbb
+      Handler: CloudFormationCreateResourceServer.handler
+      Role:
+        Fn::GetAtt:
+        - LambdaForCloudFormation
+        - Arn
+    DependsOn: CloudFormationSendResponse
+  UserPoolTest:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolTest
+  UserPoolTestClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: UserPoolTestClient
+      GenerateSecret: true
+      UserPoolId:
+        Ref: UserPoolTest
+  UserPoolTestClientSettings:
+    Type: Custom::CognitoUserPoolClientSettings
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+        - CloudFormationCognitoUserPoolClientSettings
+        - Arn
+      UserPoolId:
+        Ref: UserPoolTest
+      UserPoolClientId:
+        Ref: UserPoolTestClient
+      SupportedIdentityProviders:
+      - COGNITO
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+      - client_credentials
+      AllowedOAuthScopes:
+      - LifeBenefits-Dev/read-uw-status
+    DependsOn: CloudFormationCognitoResourceServer
+  UserPoolTestDomain:
+    Type: Custom::CognitoUserPoolDomain
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+        - CloudFormationCognitoUserPoolDomain
+        - Arn
+      UserPoolId:
+        Ref: UserPoolTest
+      Domain: userpool-test-01
+  CognitoResourceServer:
+    Type: Custom::CognitoResourceServer
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+        - CloudFormationCognitoResourceServer
+        - Arn
+      Identifier: LifeBenefits-Dev
+      Name: LifeBenefits-Dev
+      UserPoolId:
+        Ref: UserPoolTest
+      Scopes:
+      - ScopeDescription: Read UW status
+        ScopeName: read-uw-status

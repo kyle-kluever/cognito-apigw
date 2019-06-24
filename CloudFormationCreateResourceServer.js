@@ -3,33 +3,36 @@ const AWS = require('aws-sdk');
 exports.handler = async (event) => {
     try {
         var cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
-        
+
+        console.log('Here are the scopes');
+        console.log(event.ResourceProperties.Scopes);
+
         switch (event.RequestType) {
             case 'Create':
                 await cognitoIdentityServiceProvider.createResourceServer({
                     Identifier: event.ResourceProperties.Identifier,
                     Name: event.ResourceProperties.Name,
                     UserPoolId: event.ResourceProperties.UserPoolId,
-                    Scopes: [event.ResourceProperties.Scopes]
+                    Scopes: event.ResourceProperties.Scopes
                 }).promise();
                 break;
-                
+
             case 'Update':
-                await deleteResourceServer(cognitoIdentityServiceProvider, event.OldResourceProperties.Identifier, event.OldResourceProperties.UserPoolId);
-                
+                await deleteResourceServer(cognitoIdentityServiceProvider, event.ResourceProperties.Identifier, event.ResourceProperties.UserPoolId);
+
                 await cognitoIdentityServiceProvider.createResourceServer({
                     Identifier: event.ResourceProperties.Identifier,
                     Name: event.ResourceProperties.Name,
                     UserPoolId: event.ResourceProperties.UserPoolId,
-                    Scopes: [event.ResourceProperties.Scopes]
+                    Scopes: event.ResourceProperties.Scopes
                 }).promise();
                 break;
-                
+
             case 'Delete':
-                await deleteResourceServer(cognitoIdentityServiceProvider, event.OldResourceProperties.Identifier, event.OldResourceProperties.UserPoolId);
+                await deleteResourceServer(cognitoIdentityServiceProvider, event.ResourceProperties.Identifier, event.ResourceProperties.UserPoolId);
                 break;
         }
-        
+
         await sendCloudFormationResponse(event, 'SUCCESS');
         console.info(`CognitoResourceServer Success for request type ${event.RequestType}`);
     } catch (error) {
@@ -43,7 +46,7 @@ async function deleteResourceServer(cognitoIdentityServiceProvider, identifier, 
         Identifier: identifier,
         UserPoolId: userPoolId
     }).promise();
-    
+
     if (response.ResourceServer.Identifier) {
         await cognitoIdentityServiceProvider.deleteResourceServer({
             Identifier: response.ResourceServer.Identifier,
@@ -65,10 +68,10 @@ async function sendCloudFormationResponse(event, responseStatus, responseData) {
             ResponseData: responseData
         })
     };
-    
+
     var lambda = new AWS.Lambda();
     var response = await lambda.invoke(params).promise();
-    
+
     if (response.FunctionError) {
         var responseError = JSON.parse(response.Payload);
         throw new Error(responseError.errorMessage);

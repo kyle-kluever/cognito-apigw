@@ -52,6 +52,23 @@ Resources:
                 Action: 'cognito-idp:DescribeUserPoolDomain'
                 Resource: '*'
         -
+          PolicyName: ManageResourceServer
+          PolicyDocument: 
+            Version: '2012-10-17'
+            Statement: 
+              -
+                Effect: Allow
+                Action: 'cognito-idp:CreateResourceServer'
+                Resource: 'arn:aws:cognito-idp:*:*:userpool/*'
+              -
+                Effect: Allow
+                Action: 'cognito-idp:DeleteResourceServer'
+                Resource: 'arn:aws:cognito-idp:*:*:userpool/*'
+              -
+                Effect: Allow
+                Action: 'cognito-idp:DescribeResourceServer'
+                Resource: '*'
+        -
           PolicyName: InvokeLambdaFunction
           PolicyDocument: 
             Version: '2012-10-17'
@@ -91,8 +108,8 @@ Resources:
     Properties:
       FunctionName: CloudFormationCognitoResourceServer
       Runtime: nodejs8.10
-      Code: ./CloudFormationCognitoResourceServer.js
-      Handler: CloudFormationCognitoResourceServer.handler
+      Code: ./CloudFormationCreateResourceServer.js
+      Handler: CloudFormationCreateResourceServer.handler
       Role: !GetAtt LambdaForCloudFormation.Arn
     DependsOn: CloudFormationSendResponse
   UserPoolTest:
@@ -113,13 +130,12 @@ Resources:
       UserPoolClientId: !Ref UserPoolTestClient
       SupportedIdentityProviders:
         - COGNITO
-      CallbackURL: 'https://www.amazon.com'
-      LogoutURL: 'https://www.google.com'
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthFlows:
-        - code
+        - client_credentials
       AllowedOAuthScopes:
-        - openid
+        - 'LifeBenefits-Dev/read-uw-status'
+    DependsOn: CloudFormationCognitoResourceServer
   UserPoolTestDomain:
     Type: 'Custom::CognitoUserPoolDomain'
     Properties:
