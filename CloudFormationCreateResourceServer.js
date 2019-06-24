@@ -17,9 +17,7 @@ exports.handler = async (event) => {
                 break;
 
             case 'Update':
-                await deleteResourceServer(cognitoIdentityServiceProvider, event.ResourceProperties.Identifier, event.ResourceProperties.UserPoolId);
-
-                await cognitoIdentityServiceProvider.createResourceServer({
+                await cognitoIdentityServiceProvider.updateResourceServer({
                     Identifier: event.ResourceProperties.Identifier,
                     Name: event.ResourceProperties.Name,
                     UserPoolId: event.ResourceProperties.UserPoolId,
