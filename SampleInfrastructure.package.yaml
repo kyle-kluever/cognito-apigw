@@ -85,7 +85,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: b9361dcfaa9561dedc79db26e75e0030
+        S3Key: 3f142e3f9798fc8d207a78dc549a4d1e
       Handler: CloudFormationCognitoUserPoolClientSettings.handler
       Role:
         Fn::GetAtt:
@@ -99,7 +99,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: fcc0edc03f2d9bc636ca231c090c70b2
+        S3Key: db0ff3318d5b84b986d431eb5be5b5eb
       Handler: CloudFormationCognitoUserPoolDomain.handler
       Role:
         Fn::GetAtt:
@@ -113,7 +113,7 @@ Resources:
       Runtime: nodejs8.10
       Code:
         S3Bucket: kyle-cf-templates
-        S3Key: bf8168336a448732f349246b0b80b450
+        S3Key: 282f6ebebdb5c2c9983255d51785f142
       Handler: CloudFormationCreateResourceServer.handler
       Role:
         Fn::GetAtt:
@@ -174,5 +174,3 @@ Resources:
       Scopes:
       - ScopeDescription: Read UW status
         ScopeName: read-uw-status
-      - ScopeDescription: Create EOI Notification
-        ScopeName: create-eoi-notification

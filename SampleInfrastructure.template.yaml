@@ -156,5 +156,3 @@ Resources:
       Scopes:
         - ScopeDescription: 'Read UW status'
           ScopeName: 'read-uw-status'
-        - ScopeDescription: 'Create EOI Notification'
-          ScopeName: 'create-eoi-notification'

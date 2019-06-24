@@ -26,7 +26,7 @@ exports.handler = async (event) => {
                 break;
 
             case 'Delete':
-                await deleteResourceServer(cognitoIdentityServiceProvider, event.ResourceProperties.Identifier, event.ResourceProperties.UserPoolId);
+                //await deleteResourceServer(cognitoIdentityServiceProvider, event.ResourceProperties.Identifier, event.ResourceProperties.UserPoolId);
                 break;
         }
 
