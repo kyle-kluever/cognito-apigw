@@ -128,6 +128,7 @@ Resources:
       UserPoolId: !Ref UserPoolTest
   UserPoolTestClientSettings:
     Type: 'Custom::CognitoUserPoolClientSettings'
+    UpdateReplacePolicy: Retain
     Properties:
       ServiceToken: !GetAtt CloudFormationCognitoUserPoolClientSettings.Arn
       UserPoolId: !Ref UserPoolTest
@@ -142,12 +143,14 @@ Resources:
     DependsOn: CloudFormationCognitoResourceServer
   UserPoolTestDomain:
     Type: 'Custom::CognitoUserPoolDomain'
+    UpdateReplacePolicy: Retain
     Properties:
       ServiceToken: !GetAtt CloudFormationCognitoUserPoolDomain.Arn
       UserPoolId: !Ref UserPoolTest
       Domain: 'kyle-userpool-test-01'
   CognitoResourceServer:
     Type: 'Custom::CognitoResourceServer'
+    UpdateReplacePolicy: Retain
     Properties:
       ServiceToken: !GetAtt CloudFormationCognitoResourceServer.Arn
       Identifier: LifeBenefits-Dev
