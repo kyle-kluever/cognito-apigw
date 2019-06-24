@@ -4,7 +4,6 @@ exports.handler = async (event) => {
     try {
         var cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
-        console.log('Here are the scopes');
         console.log(event.ResourceProperties.Scopes);
 
         switch (event.RequestType) {
